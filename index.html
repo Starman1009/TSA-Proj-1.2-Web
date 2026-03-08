@@ -40,6 +40,7 @@
             align-items: center;
             visibility: hidden;
             z-index: 10;
+            opacity: 1;
         }
 
         #status-splash {
@@ -131,7 +132,7 @@
 
     <script src="index.js"></script>
     <script>
-        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":28946612,"index.wasm":38034280},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":28952260,"index.wasm":38034280},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
         const engine = new Engine(GODOT_CONFIG);
 
         (function () {
@@ -150,7 +151,6 @@
                 if (statusMode === mode || !initializing) return;
                 
                 if (mode === 'hidden') {
-                    // This function is called by Godot when it's technically ready
                     gameReady = true;
                     return; 
                 }
@@ -165,21 +165,20 @@
                 statusMode = mode;
             }
 
-            // Fake Loading Logic to make it feel longer and smoother
             function updateFakeProgress() {
                 if (!initializing) return;
 
-                // Move displayed progress toward actual progress slowly
+                // Smooth bar movement
                 if (displayedProgress < actualProgress) {
-                    displayedProgress += 0.5; // Controls the "speed" of the bar
+                    displayedProgress += 0.5; 
                 }
 
                 statusProgress.value = displayedProgress;
 
-                // Only hide the overlay if Godot is ready AND the bar is full
+                // Hide overlay only when Godot is ready AND progress bar hits 100%
                 if (gameReady && displayedProgress >= 100) {
+                    statusOverlay.style.transition = 'opacity 1.5s ease';
                     statusOverlay.style.opacity = '0';
-                    statusOverlay.style.transition = 'opacity 1.5s ease'; // Longer fade for dramatic effect
                     setTimeout(() => {
                         statusOverlay.remove();
                     }, 1500);
@@ -189,14 +188,25 @@
                 }
             }
 
+            function setStatusNotice(text) {
+                while (statusNotice.lastChild) {
+                    statusNotice.removeChild(statusNotice.lastChild);
+                }
+                const lines = text.split('\n');
+                lines.forEach((line) => {
+                    statusNotice.appendChild(document.createTextNode(line));
+                    statusNotice.appendChild(document.createElement('br'));
+                });
+            }
+
             function displayFailureNotice(err) {
                 console.error(err);
                 if (err instanceof Error) {
-                    statusNotice.innerText = err.message;
+                    setStatusNotice(err.message);
                 } else if (typeof err === 'string') {
-                    statusNotice.innerText = err;
+                    setStatusNotice(err);
                 } else {
-                    statusNotice.innerText = 'An unknown error occurred.';
+                    setStatusNotice('An unknown error occurred.');
                 }
                 setStatusMode('notice');
                 initializing = false;
@@ -208,7 +218,6 @@
             engine.startGame({
                 'onProgress': function (current, total) {
                     if (total > 0) {
-                        // We set actualProgress to 100, but updateFakeProgress makes it take time to get there
                         actualProgress = (current / total) * 100;
                     }
                 },
