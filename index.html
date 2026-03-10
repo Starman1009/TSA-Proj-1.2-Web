@@ -132,7 +132,7 @@
 
     <script src="index.js"></script>
     <script>
-        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":28955172,"index.wasm":38034280},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":30607308,"index.wasm":37685705},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
         const engine = new Engine(GODOT_CONFIG);
 
         (function () {
@@ -168,14 +168,12 @@
             function updateFakeProgress() {
                 if (!initializing) return;
 
-                // Smooth bar movement: interpolate displayed progress toward actual progress
                 if (displayedProgress < actualProgress) {
                     displayedProgress += 0.5; 
                 }
 
                 statusProgress.value = displayedProgress;
 
-                // Hide overlay only when Godot engine is ready AND progress bar visually hits 100%
                 if (gameReady && displayedProgress >= 100) {
                     statusOverlay.style.transition = 'opacity 1.5s ease';
                     statusOverlay.style.opacity = '0';
