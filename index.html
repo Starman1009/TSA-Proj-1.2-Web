@@ -168,14 +168,14 @@
             function updateFakeProgress() {
                 if (!initializing) return;
 
-                // Smooth bar movement
+                // Smooth bar movement: interpolate displayed progress toward actual progress
                 if (displayedProgress < actualProgress) {
                     displayedProgress += 0.5; 
                 }
 
                 statusProgress.value = displayedProgress;
 
-                // Hide overlay only when Godot is ready AND progress bar hits 100%
+                // Hide overlay only when Godot engine is ready AND progress bar visually hits 100%
                 if (gameReady && displayedProgress >= 100) {
                     statusOverlay.style.transition = 'opacity 1.5s ease';
                     statusOverlay.style.opacity = '0';
@@ -212,7 +212,6 @@
                 initializing = false;
             }
 
-            // Check for missing features before starting
             const missing = Engine.getMissingFeatures();
             if (missing.length !== 0) {
                 const missingMsg = 'Error\nRequired features missing:\n';
